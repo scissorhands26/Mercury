@@ -34,8 +34,6 @@ export function ListImplant() {
               new Date(b.updated).getTime() - new Date(a.updated).getTime()
           )
           .map((task: any) => {
-            task.timeAgo = TimeAgo(task.updated);
-            console.log(task.timeAgo);
             return task;
           })
       );
@@ -45,23 +43,27 @@ export function ListImplant() {
     fetchData();
   }, [id]);
 
-  function TimeAgo(taskDate: any) {
-    const timeDifference = new Date().getTime() - new Date(taskDate).getTime();
-    const seconds = Math.floor(timeDifference / 1000);
+  function convertTimestamp(timestamp: string) {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const seconds = Math.floor((now.getTime() - time.getTime()) / 1000);
+    const intervals = [
+      { label: "year", seconds: 31536000 },
+      { label: "month", seconds: 2592000 },
+      { label: "day", seconds: 86400 },
+      { label: "hour", seconds: 3600 },
+      { label: "minute", seconds: 60 },
+      { label: "second", seconds: 1 },
+    ];
 
-    if (seconds < 60) {
-      return `${seconds} seconds ago`;
+    for (const interval of intervals) {
+      const intervalCount = Math.floor(seconds / interval.seconds);
+      if (intervalCount > 0) {
+        return `${intervalCount} ${interval.label}${
+          intervalCount > 1 ? "s" : ""
+        } ago`;
+      }
     }
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) {
-      return `${minutes} minutes ago`;
-    }
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours} hours ago`;
-    }
-    const days = Math.floor(hours / 24);
-    return `${days} days ago`;
   }
 
   useEffect(() => {
@@ -170,6 +172,7 @@ export function ListImplant() {
                           Last Checkin
                         </dt>
                         <dd className="mt-1 text-sm text-slate-100 sm:col-span-2 sm:mt-0">
+                          {convertTimestamp(implant.last_checkin_date)}
                           {implant.last_checkin_date} from{" "}
                           {implant.last_checkin_ip}
                         </dd>
@@ -233,7 +236,9 @@ export function ListImplant() {
                                 "Incomplete"
                               ) : task.status === 1 ? (
                                 <>
-                                  <div>Completed: {task.timeAgo}</div>
+                                  <div>
+                                    Completed: {convertTimestamp(task.updated)}
+                                  </div>
                                   {task.updated}
                                 </>
                               ) : task.status === 2 ? (
