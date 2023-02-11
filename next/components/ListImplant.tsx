@@ -172,8 +172,8 @@ export function ListImplant() {
                           Last Checkin
                         </dt>
                         <dd className="mt-1 text-sm text-slate-100 sm:col-span-2 sm:mt-0">
-                          {convertTimestamp(implant.last_checkin_date)}
-                          {implant.last_checkin_date} from{" "}
+                          {implant.last_checkin_date} (
+                          {convertTimestamp(implant.last_checkin_date)}) from{" "}
                           {implant.last_checkin_ip}
                         </dd>
                       </div>
