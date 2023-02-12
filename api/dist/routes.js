@@ -33,7 +33,7 @@ export const checkinRoute = (req, res) => __awaiter(void 0, void 0, void 0, func
     const updatedRecord = yield updateCheckinDate(implant.id);
     if (implant.tasks.length === 0) {
         const response = JSON.stringify({
-            message: "Implant checkin complete. Last checkin date updated to ${updatedRecord.last_checkin_date}.",
+            message: `Implant checkin complete. Last checkin date updated to ${updatedRecord.last_checkin_date}.`,
         });
         console.log(response);
         return res.status(200).send(response);
@@ -59,21 +59,41 @@ export const completeTaskRoute = (req, res) => __awaiter(void 0, void 0, void 0,
     console.log(implant);
     console.log(req.body.task);
     const id = req.body.task.id;
+    const ImplantsTasks = [];
+    implant.tasks.forEach((task) => {
+        console.log(task);
+        ImplantsTasks.push(task);
+    });
     function completeTask(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = JSON.stringify(req.body.task.data);
-            const response = yield fetch(`http://127.0.0.1:8090/api/collections/tasks/records/${id}`, {
+            const TaskData = JSON.stringify(req.body.task.data);
+            const TaskResponse = yield fetch(`http://127.0.0.1:8090/api/collections/tasks/records/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ data: data, status: 1 }),
+                body: JSON.stringify({ data: TaskData, status: 1 }),
             });
-            if (response.status === 404) {
+            console.log("+++++++++++++++++++++++++++++++++++++");
+            console.log(implant.id);
+            const ImplantResponse = yield fetch(`http://127.0.0.1:8090/api/collections/implants/records/${implant.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    tasks: ImplantsTasks.filter((task) => task !== id),
+                }),
+            });
+            if (TaskResponse.status === 404) {
                 console.error(`Task with id ${id} not found.`);
                 return null;
             }
-            const record = yield response.json();
+            if (ImplantResponse.status === 404) {
+                console.error(`Task with id ${id} not found.`);
+                return null;
+            }
+            const record = yield TaskResponse.json();
             return record;
         });
     }

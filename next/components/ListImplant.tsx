@@ -22,22 +22,18 @@ export function ListImplant() {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await GetData(id);
-      console.log(data);
+      const ImplantData = await GetImplantData(id);
+      const TaskData = await GetTaskData(id);
+      console.log(TaskData);
+      console.log(ImplantData);
       let parsedData;
-      data ? setImplant(JSON.parse(data)) : console.log("No Data");
-      data ? (parsedData = JSON.parse(data)) : console.log("No Data");
-      setTasks(
-        parsedData?.expand.tasks
-          .sort(
-            (a: any, b: any) =>
-              new Date(b.updated).getTime() - new Date(a.updated).getTime()
-          )
-          .map((task: any) => {
-            return task;
-          })
-      );
-
+      ImplantData
+        ? setImplant(JSON.parse(ImplantData))
+        : console.log("No Data");
+      ImplantData
+        ? (parsedData = JSON.parse(ImplantData))
+        : console.log("No Data");
+      TaskData ? setTasks(JSON.parse(TaskData)) : console.log("No Data");
       setLoading(false);
     }
     fetchData();
@@ -97,6 +93,7 @@ export function ListImplant() {
     const TaskData = {
       task: task,
       status: 0,
+      implant: implant?.id,
     };
     const TaskRecord = await pb.collection("tasks").create(TaskData);
     console.log(TaskRecord);
@@ -303,13 +300,27 @@ async function DeleteImplant(item: Implant) {
   window.location.reload();
 }
 
-async function GetData(id: any) {
+async function GetImplantData(id: any) {
   const pb = new PocketBase("http://127.0.0.1:8090");
   if (id !== undefined) {
     const record = await pb.collection("implants").getOne(id, {
       expand: "tasks",
     });
     const data = JSON.stringify(record);
+    return data as string;
+  }
+}
+
+async function GetTaskData(id: any) {
+  console.log("=================", id);
+  const pb = new PocketBase("http://127.0.0.1:8090");
+  if (id !== undefined) {
+    const records = await pb.collection("tasks").getFullList(200, {
+      filter: `implant = '${id}'`,
+      sort: "-updated",
+    });
+    const data = JSON.stringify(records);
+    console.log(records);
     return data as string;
   }
 }

@@ -33,8 +33,7 @@ export const checkinRoute = async (req: Request, res: Response) => {
 
   if (implant.tasks.length === 0) {
     const response = JSON.stringify({
-      message:
-        "Implant checkin complete. Last checkin date updated to ${updatedRecord.last_checkin_date}.",
+      message: `Implant checkin complete. Last checkin date updated to ${updatedRecord.last_checkin_date}.`,
     });
     console.log(response);
     return res.status(200).send(response);
@@ -63,26 +62,51 @@ export const completeTaskRoute = async (req: Request, res: Response) => {
   console.log(req.body.task);
 
   const id = req.body.task.id;
+  const ImplantsTasks: any = [];
+  implant.tasks.forEach((task: any) => {
+    console.log(task);
+    ImplantsTasks.push(task);
+  });
 
   async function completeTask(id: any) {
-    const data = JSON.stringify(req.body.task.data);
-    const response = await fetch(
+    const TaskData = JSON.stringify(req.body.task.data);
+    const TaskResponse = await fetch(
       `http://127.0.0.1:8090/api/collections/tasks/records/${id}`,
       {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: data, status: 1 }),
+        body: JSON.stringify({ data: TaskData, status: 1 }),
       }
     );
 
-    if (response.status === 404) {
+    console.log("+++++++++++++++++++++++++++++++++++++");
+    console.log(implant.id);
+
+    const ImplantResponse = await fetch(
+      `http://127.0.0.1:8090/api/collections/implants/records/${implant.id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tasks: ImplantsTasks.filter((task: any) => task !== id),
+        }),
+      }
+    );
+
+    if (TaskResponse.status === 404) {
+      console.error(`Task with id ${id} not found.`);
+      return null;
+    }
+    if (ImplantResponse.status === 404) {
       console.error(`Task with id ${id} not found.`);
       return null;
     }
 
-    const record = await response.json();
+    const record = await TaskResponse.json();
     return record;
   }
 
