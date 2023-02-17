@@ -10,8 +10,9 @@ export const LocationMap = (props: { lat: number; lng: number }) => {
   };
 
   useEffect(() => {
-    // const apiKey = "AIzaSyCmwQOE--3fKYEt6Z6kExW_ooQt4BCmW4M";
-    const apiKey = "";
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY
+      ? process.env.GOOGLE_MAPS_API_KEY
+      : "";
     const center = `${props.lat},${props.lng}`;
     const size = "300x300";
     const zoom = "14";
